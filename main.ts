@@ -1,4 +1,4 @@
-import { Tree } from "./tree"
+import { Tree } from './tree';
 
 const tree = new Tree(20);
 tree.add(10);
