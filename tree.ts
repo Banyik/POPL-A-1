@@ -1,4 +1,4 @@
-export class Tree {
+export default class Tree implements Iterator<Object> {
   protected value: number = 0;
   private left: Tree | null;
   private right: Tree | null;
@@ -7,6 +7,9 @@ export class Tree {
     this.setValue(value);
     this.left = null;
     this.right = null;
+  }
+  next(...args: [] | [undefined]): IteratorResult<Object, any> {
+    throw new Error('Method not implemented.');
   }
 
   private setValue(v: number): void {
@@ -52,74 +55,29 @@ export class Tree {
     return this.value === node2.value;
   }
 
-  public treeIterator(start = 0, end = this.getDepth(), step = 1) {
-    let nextIndex = start;
-    let iterationCount = 0;
+  myIterator = {
+    next() {
+      let done = false;
+      let value;
+      let traversal: Tree[] = [];
+      inorderTraversal(this);
 
-    const treeIter = {
-      next() {
-        let result;
-        if (nextIndex < end) {
-          result = { value: nextIndex, done: false };
-          nextIndex += step;
-          iterationCount++;
-          return result;
+      function inorderTraversal(node: Tree) {
+        if (node != null) {
+          inorderTraversal(node.left);
+          traversal.push(node);
+          inorderTraversal(node.right);
         }
-        return { value: iterationCount, done: true };
-      },
-    };
-    return treeIter;
-  }
+      }
 
-  public inorderTraversal(Tree) {
-    const result: number[] = [];
+      let node: Tree = traversal.pop();
+      if (node) value = node.value;
+      else done = true;
 
-    function inorderTraverse(node: Tree | null) {
-      if (!node) return;
-
-      inorderTraverse(node.left);
-      result.push(node.value);
-      inorderTraverse(node.right);
-    }
-
-    inorderTraverse(Tree);
-
-    return result;
-  }
-
-  public TreeIterator() {
-    let treeInArray: number[];
-    let currentIndex: number = 0;
-
-    function Iterator(root: Tree) {
-      let list: number[] = [];
-      PopulateArray(root, list);
-      let treeInArray: number[] = list.map((e) => treeInArray.push(e));
-      let currentIndex: number = -1;
-    }
-
-    function HasNext() {
-      return currentIndex < treeInArray.length - 1;
-    }
-
-    function Next() {
-      return treeInArray[++currentIndex];
-    }
-
-    function HasPrev() {
-      return currentIndex > 0;
-    }
-
-    function Prev() {
-      return treeInArray[--currentIndex];
-    }
-
-    function PopulateArray(node: Tree, list: number[]) {
-      if (node == null) return;
-      if (node.left != null) PopulateArray(node.left, list);
-
-      list.push(node.value);
-      if (node.right != null) PopulateArray(node.right, list);
-    }
-  }
+      return { done: done, value: value };
+    },
+    [Symbol.iterator]() {
+      return this;
+    },
+  };
 }
